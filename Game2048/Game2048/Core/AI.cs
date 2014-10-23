@@ -4,53 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Game2048
+namespace Game2048.Core
 {
-    class Grid
-    {
-
-        internal int[] AvailableCells()
-        {
- 	        return null;
-        }
-    
-        internal float smoothness()
-        {
- 	        throw new NotImplementedException();
-        }
-        internal float monotonicity2()
-        {
- 	        throw new NotImplementedException();
-        }
-        internal float maxValue()
-        {
- 	        throw new NotImplementedException();
-        }
-    
-public  bool playerTurn { get; set; }
-internal Grid clone()
-{
- 	throw new NotImplementedException();
-}
-internal Game2048.AI.MoveResult move(int direction)
-{
- 	throw new NotImplementedException();
-}
-internal bool isWin()
-{
- 	throw new NotImplementedException();
-}
-internal IEnumerable<GridCell> availableCells()
-{
- 	throw new NotImplementedException();
-}}
-
-    public class GridCell
-    {
-        public int X{get;set;}
-        public int Y{get;set;}
-        public int Value{get;set;}
-    }
+  
 
     class AI
     {
@@ -68,7 +24,7 @@ internal IEnumerable<GridCell> availableCells()
               emptyWeight  = 2.7f,
               maxWeight    = 1.0f;
 
-            return this.grid.smoothness() * smoothWeight
+            return this.grid.CalculateSmoothness() * smoothWeight
                + this.grid.monotonicity2() * mono2Weight
                + (float)Math.Log(emptyCells) * emptyWeight
                + this.grid.maxValue() * maxWeight;
@@ -81,7 +37,7 @@ internal IEnumerable<GridCell> availableCells()
 
         public class SearchResult
         {
-            public int move{get;set;}
+            public int? move{get;set;}
         
 public  int score { get; set; }
 public  int positions { get; set; }
@@ -95,12 +51,12 @@ public  int cutoffs { get; set; }}
               SearchResult result;
 
                 // the maxing player
-            if (this.grid.playerTurn) 
+            if (this.grid.PlayerTurn) 
             {
                 bestScore = alpha;
                 for (int direction = 0 ; direction<4;direction++)
                 {
-                    Grid newGrid = this.grid.clone();
+                    Grid newGrid = this.grid.Clone();
                     if (newGrid.move(direction).moved)
                     {
                         positions++;
@@ -152,7 +108,7 @@ public  int cutoffs { get; set; }}
 
     // try a 2 and 4 in each cell and measure how annoying it is
     // with metrics from eval
-    var candidates = new List<int>();
+    var candidates = new List<Candidate>();
     var cells = this.grid.availableCells();
     var scores = new Dictionary<int, List<int>>();
     
@@ -163,12 +119,11 @@ public  int cutoffs { get; set; }}
     {
           foreach (var cell in cells) 
           {
-                scores[score].push(null);
                 
-                var tile = new Tile(cell, parseInt(score, 10));
-                this.grid.insertTile(tile);
-                scores[score][i] = -this.grid.smoothness() + this.grid.islands();
-                this.grid.removeTile(cell);
+                this.grid.insertTile(cell.X, cell.Y, score);
+                int value = -this.grid.CalculateSmoothness() + this.grid.islands();
+              score.Value.Add(value);
+                this.grid.removeTile(cell.X, cell.Y);
           }
     }
 
@@ -177,40 +132,47 @@ public  int cutoffs { get; set; }}
     
 
     // now just pick out the most annoying moves
-    var maxScore = Math.max(Math.max.apply(null, scores[2]), Math.max.apply(null, scores[4]));
-    for (var value in scores) { // 2 and 4
-      for (var i=0; i<scores[value].length; i++) {
-        if (scores[value][i] == maxScore) {
-          candidates.push( { position: cells[i], value: parseInt(value, 10) } );
+    var maxScore = Math.Max(scores[2].Max(), scores[4].Max());
+    foreach (var score in scores) { // 2 and 4
+      for (var i=0; i<score.Value.Count; i++) {
+        if (score.Value[i] == maxScore) {
+          candidates.Add(new Candidate()
+          { 
+              position= cells[i], 
+              value= score.Key 
+          });
         }
       }
     }
 
-    // search on each candidate
-    for (var i=0; i<candidates.length; i++) {
-      var position = candidates[i].position;
-      var value = candidates[i].value;
-      var newGrid = this.grid.clone();
-      var tile = new Tile(position, value);
-      newGrid.insertTile(tile);
-      newGrid.playerTurn = true;
-      positions++;
-      newAI = new AI(newGrid);
-      result = newAI.search(depth, alpha, bestScore, positions, cutoffs);
-      positions = result.positions;
-      cutoffs = result.cutoffs;
+                foreach(var candidate in candidates){
+                    var position = candidate.position;
+                    var value = candidate.value;
+                    var newGrid = this.grid.Clone();
+                    newGrid.insertTile(position);
+                    newGrid.PlayerTurn=true;
+                    positions ++;
+                    var newAi = new AI(newGrid);
+                    result = newAi.Search(depth, alpha, bestScore, positions, cutoffs);
+                    positions = result.positions;
+                    cutoffs=result.cutoffs;
 
-      if (result.score < bestScore) {
-        bestScore = result.score;
-      }
-      if (bestScore < alpha) {
-        cutoffs++;
-        return { move: null, score: alpha, positions: positions, cutoffs: cutoffs };
-      }
-    }
-  }
+                    if(result.score < bestScore){
+                        bestScore = result.score;
+                    }
+                    if(bestScore < alpha){
+                        cutoffs ++;
+                        return new SearchResult(){
+                            move = null,
+                            score= alpha,
+                            positions = positions,
+                            cutoffs = cutoffs
+                        };
+                    }
 
-  return { move: bestMove, score: bestScore, positions: positions, cutoffs: cutoffs };
+                }
+
+  return new SearchResult{ move= bestMove, score= bestScore, positions= positions, cutoffs= cutoffs };
 }
 
 private int eval()
