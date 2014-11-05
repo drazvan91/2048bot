@@ -1,12 +1,17 @@
-﻿namespace Game2048.Core
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Game2048.Core
 {
-    public enum Direction : byte
+    public enum Direction: byte
     {
         Up = 0,
         Right = 1,
         Down = 2,
-        Left = 3,
-        None = 4
+        Left = 3
     }
 
     public static class DirectionHelper
@@ -24,7 +29,7 @@
 
         public static Position GetDirectionVector(Direction direction)
         {
-            return GetDirectionVector((byte) direction);
+            return GetDirectionVector((byte)direction);
         }
 
         public static Position GetDirectionVector(int direction)

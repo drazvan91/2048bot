@@ -30,6 +30,10 @@
         {
             this.btn_init = new System.Windows.Forms.Button();
             this.webBrowser1 = new System.Windows.Forms.WebBrowser();
+            this.rich_info = new System.Windows.Forms.RichTextBox();
+            this.button1 = new System.Windows.Forms.Button();
+            this.speedLabel = new System.Windows.Forms.Label();
+            this.timeLabel = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // btn_init
@@ -50,19 +54,61 @@
             this.webBrowser1.Location = new System.Drawing.Point(13, 32);
             this.webBrowser1.MinimumSize = new System.Drawing.Size(20, 20);
             this.webBrowser1.Name = "webBrowser1";
-            this.webBrowser1.Size = new System.Drawing.Size(719, 501);
+            this.webBrowser1.Size = new System.Drawing.Size(749, 501);
             this.webBrowser1.TabIndex = 1;
+            // 
+            // rich_info
+            // 
+            this.rich_info.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.rich_info.Location = new System.Drawing.Point(768, 96);
+            this.rich_info.Name = "rich_info";
+            this.rich_info.Size = new System.Drawing.Size(140, 437);
+            this.rich_info.TabIndex = 2;
+            this.rich_info.Text = "";
+            // 
+            // button1
+            // 
+            this.button1.Location = new System.Drawing.Point(94, 3);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(75, 23);
+            this.button1.TabIndex = 3;
+            this.button1.Text = "button1";
+            this.button1.UseVisualStyleBackColor = true;
+            this.button1.Click += new System.EventHandler(this.button1_Click);
+            // 
+            // speedLabel
+            // 
+            this.speedLabel.AutoSize = true;
+            this.speedLabel.Location = new System.Drawing.Point(768, 80);
+            this.speedLabel.Name = "speedLabel";
+            this.speedLabel.Size = new System.Drawing.Size(35, 13);
+            this.speedLabel.TabIndex = 4;
+            this.speedLabel.Text = "label1";
+            // 
+            // timeLabel
+            // 
+            this.timeLabel.AutoSize = true;
+            this.timeLabel.Location = new System.Drawing.Point(768, 64);
+            this.timeLabel.Name = "timeLabel";
+            this.timeLabel.Size = new System.Drawing.Size(35, 13);
+            this.timeLabel.TabIndex = 5;
+            this.timeLabel.Text = "label1";
             // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(744, 545);
+            this.ClientSize = new System.Drawing.Size(920, 545);
+            this.Controls.Add(this.timeLabel);
+            this.Controls.Add(this.speedLabel);
+            this.Controls.Add(this.button1);
+            this.Controls.Add(this.rich_info);
             this.Controls.Add(this.webBrowser1);
             this.Controls.Add(this.btn_init);
             this.Name = "MainForm";
             this.Text = "Form1";
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
@@ -70,6 +116,10 @@
 
         private System.Windows.Forms.Button btn_init;
         private System.Windows.Forms.WebBrowser webBrowser1;
+        private System.Windows.Forms.RichTextBox rich_info;
+        private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.Label speedLabel;
+        private System.Windows.Forms.Label timeLabel;
     }
 }
 

@@ -62,10 +62,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Class1.cs" />
-    <Compile Include="GameAi.cs" />
-    <Compile Include="I2048GameView.cs" />
-    <Compile Include="GameGrid.cs" />
-    <Compile Include="MoveTransition.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

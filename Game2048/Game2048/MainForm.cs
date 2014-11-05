@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
@@ -8,8 +7,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using Game2048.Core;
+using Game2048.Models;
+using Game2048.Utils;
+using Game2048.View;
 using Microsoft.Win32;
 using Newtonsoft.Json;
+using Game2048.Bot;
 
 namespace Game2048
 {
@@ -17,100 +21,139 @@ namespace Game2048
     {
         Timer timer = new Timer();
 
-
         bool initialized = false;
+        private IGameGrid _viewState;
+        private GameAi _gameAi;
+        private ILogger _logger;
+        private DateTime dateStarted;
+        private int moveNumber;
+
         public MainForm()
         {
             InitializeComponent();
-            RegisterIE11();
+            _logger=new DebugOutputLogger();
             this.Load += MainForm_Load;
-            timer.Interval = 3000;
+            timer.Interval = 1;
             timer.Tick += timer_Tick;
         }
 
         void timer_Tick(object sender, EventArgs e)
         {
+            timer.Stop();
             webBrowser1.Focus();
-            //SendKeys.Send("{RIGHT}");
-            //string s = new string(new char[] { (char)Keys.Up, (char)Keys.Left, (char)Keys.Down, (char)Keys.Right });
-            //string s = new string(new char[] { (char)39});
 
-            ///SendKeys.Send(s);
+            var state = GetGameState();
+            var cell = this._viewState.UpdateFromState(state);
+            if (cell != null)
+            {
+                if (cell.Value > 0)
+                {
+                    this._gameAi.AddTile(cell);
+                }
+
+                var direction = this._gameAi.Move();
+                if (direction == Direction.None)
+                {
+                    _logger.WriteLine("GAME OVER");
+                    return;
+                }
+
+                this._viewState.Move(direction);
+                SendKeys.Send(DirectionHelper.GetSendKeyString(direction));
+                moveNumber++;
+                updateSpeedLabel();
+                updateTimeLabel();
+            }
+
+            timer.Start();
+            
+        }
+
+        private void updateTimeLabel()
+        {
+            var date = DateTime.Now.Subtract(dateStarted);
+            int seconds = date.Seconds;
+            int minuts = date.Minutes;
+
+            timeLabel.Text = string.Format("{0:00}:{1:00}", minuts, seconds);
+
+        }
+
+        private void updateSpeedLabel()
+        {
+            DateTime date = DateTime.Now;
+            double seconds = date.Subtract(dateStarted).TotalSeconds;
+            if (seconds > 0)
+            {
+                int speed = (int)(60*moveNumber/seconds);
+                speedLabel.Text = speed + " moves per minute";
+            }
         }
 
         void MainForm_Load(object sender, EventArgs e)
         {
-            btn_init_Click(null, null);
-            this.Height = 800;
-
-        }
-
-        private void RegisterIE11()
-        {
-            string executablePath = Environment.GetCommandLineArgs()[0];
-            string executableName = System.IO.Path.GetFileName(executablePath);
-
-            RegistryKey registrybrowser = Registry.CurrentUser.OpenSubKey
-               (@"SOFTWARE\Microsoft\Internet Explorer\Main\FeatureControl\FEATURE_BROWSER_EMULATION", true);
-
-            if (registrybrowser == null)
-            {
-                RegistryKey registryFolder = Registry.CurrentUser.OpenSubKey
-                    (@"SOFTWARE\Microsoft\Internet Explorer\Main\FeatureControl", true);
-                registrybrowser = registryFolder.CreateSubKey("FEATURE_BROWSER_EMULATION");
-            }
-            registrybrowser.SetValue(executableName, 0x02710, RegistryValueKind.DWord);
-            registrybrowser.Close();
+            NavigateToGameUrl();
+            this.Height = 700;
         }
 
         private void btn_init_Click(object sender, EventArgs e)
         {
             initialized = false;
-            webBrowser1.Navigated += webBrowser1_Navigated;
+            InitGame();
+            btn_init.Enabled = false;
+            dateStarted = DateTime.Now;
+        }
+
+        private void NavigateToGameUrl()
+        {
+            webBrowser1.Navigated +=webBrowser1_Navigated;
             webBrowser1.Navigate("http://2048game.com/");
             webBrowser1.ScriptErrorsSuppressed = true;
-            btn_init.Enabled = false;
-            
         }
 
-        class GameState
-        {
-            public class Cell
-            {
-                public int value { get; set; }
-            }
-            public class Row
-            {
-                public List<Cell> Cells { get; set; }
-            }
-            public class Grid
-            {
-                public int Size { get; set; }
-                public List<List<Cell>> cells { get; set; }
-            }
 
-            public Grid grid { get; set; }
+        private void InitGame()
+        {
+            var state = GetGameState();
+            
+            _viewState = GameGrid.FromState(state);
+            _gameAi = new GameAi(_viewState);
+
+            timer.Start();
+            rich_info.Text = this._viewState.ToString();
         }
 
-      
-
-        void UpdateTable(int[,] table, string gameState)
+        private GameState GetGameState()
         {
-            
-            GameState state = JsonConvert.DeserializeObject<GameState>(gameState);
+            GameState state = GameState.FromJson((string) webBrowser1.Document.InvokeScript("sayHello"));
+            return state;
         }
 
         void webBrowser1_Navigated(object sender, WebBrowserNavigatedEventArgs e)
         {
+            InitializeWebBrowser();
+        }
+
+        private void InitializeWebBrowser()
+        {
             if (initialized) return;
             initialized = true;
 
+            InjectJavascriptSnippet();
+
+           
+        }
+
+        private void InjectJavascriptSnippet()
+        {
             HtmlElement head = webBrowser1.Document.GetElementsByTagName("head")[0];
             HtmlElement scriptEl = webBrowser1.Document.CreateElement("script");
             scriptEl.InnerText = "function sayHello() { return window.localStorage.gameState; }";
             head.AppendChild(scriptEl);
-            string s = (string)webBrowser1.Document.InvokeScript("sayHello");
-            UpdateTable(null, s);
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
             timer.Start();
         }
     }

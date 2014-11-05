@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Game2048.Bot;
 using Game2048.Core;
+using Game2048.Utils;
+using Game2048.View;
 using NUnit.Framework;
-using Moq;
 
 namespace Game2048.Tests
 {
@@ -22,18 +19,24 @@ namespace Game2048.Tests
 
             var ai = new GameAi(gameView);
 
+            DebugOutputLogger logger = new DebugOutputLogger();
 
-            for (int i = 0; i < 10; i++)
+            for (int i = 0; i < 100; i++)
             {
-                var direction = ai.Move();
-                
+                Direction direction = ai.Move();
+                logger.WriteLine("{0}. {1}", i, direction);
+
                 gameView.Move(direction);
-                GridCell cell = gameView.AddRandomTile();
+                GridCell cell = gameView.AddRandomTile(); //.AddRightBottomTile();
+                
+                Assert.IsNotNull(cell, "Game was over");
 
                 ai.AddTile(cell);
 
                 Assert.IsNotNull(cell);
             }
+
+            gameView.Print();
         }
     }
 }

@@ -1,13 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Game2048.Core
+﻿namespace Game2048.Core
 {
-    public class GridCell: Position
+    public class GridCell : Position
     {
+        public GridCell()
+        {
+        }
+
+        public GridCell(int row, int column, int value)
+            : base(row, column)
+        {
+            this.Value = value;
+        }
+
         public int Value { get; set; }
     }
 }
