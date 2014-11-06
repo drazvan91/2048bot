@@ -20,6 +20,7 @@ namespace Game2048.Models
         }
 
         public Grid grid { get; set; }
+        public int score { get; set; }
 
         internal static GameState FromJson(string gameState)
         {

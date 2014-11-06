@@ -20,5 +20,6 @@ namespace Game2048.View
         BaseGameGrid GetCopy();
 
         GridCell UpdateFromState(Models.GameState state);
+        bool HasGreaterTile(int nextTileTarget);
     }
 }

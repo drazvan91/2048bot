@@ -150,6 +150,21 @@ namespace Game2048.View
             return result;
         }
 
+        public bool HasGreaterTile(int nextTileTarget)
+        {
+            for(int i=0;i<SIZE;i++)
+            {
+                for (int j = 0; j < SIZE; j++)
+                {
+                    if (this.grid[i, j] >= nextTileTarget)
+                    {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+
         public GridCell AddRightBottomTile()
         {
             List<Tuple<int, int>> allFree = getFree();

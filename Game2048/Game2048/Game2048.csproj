@@ -51,6 +51,11 @@
     <Compile Include="Bot\I2048GameView.cs" />
     <Compile Include="Bot\IGameAi.cs" />
     <Compile Include="Bot\RandomHelper.cs" />
+    <Compile Include="GameResources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>GameResources.resx</DependentUpon>
+    </Compile>
     <Compile Include="Models\GameState.cs" />
     <Compile Include="Utils\DebugOutputLogger.cs" />
     <Compile Include="Utils\ILogger.cs" />
@@ -79,6 +84,10 @@
     <Compile Include="View\GameGrid.cs" />
     <Compile Include="View\IGameGrid.cs" />
     <Compile Include="View\MoveTransition.cs" />
+    <EmbeddedResource Include="GameResources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>GameResources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
     <EmbeddedResource Include="MainForm.resx">
       <DependentUpon>MainForm.cs</DependentUpon>
     </EmbeddedResource>
@@ -105,7 +114,10 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <None Include="Resources\applause2.wav" />
+    <Content Include="Sounds\beep-02.wav" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

@@ -27,7 +27,7 @@ namespace Game2048.Bot
             List<MoveTransition> moves = grid.GetAllMoveStates();
             foreach (MoveTransition move in moves)
             {
-                double rating = Alphabetarate(move.State, 12, Double.MaxValue, Double.MinValue, false);
+                double rating = Alphabetarate(move.State, 10, Double.MaxValue, Double.MinValue, false);
 
                 if (rating < bestScore)
                 {
